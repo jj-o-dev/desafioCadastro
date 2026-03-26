@@ -1,0 +1,7 @@
+1 - florzinha da silva
+2 - Cachorro
+3 - Femea
+4 - PetAddress{number=0, city='Floripa', street='A11'}, NAO INFORMADO, Floripa
+5 - 9 mes(es)
+6 - 6.0
+7 - Vira lata

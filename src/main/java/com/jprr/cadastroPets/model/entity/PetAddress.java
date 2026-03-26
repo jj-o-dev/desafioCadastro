@@ -11,6 +11,18 @@ public class PetAddress {
         this.street = street;
     }
 
+    public int getNumber() {
+        return number;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
     @Override
     public String toString() {
         return "PetAddress{" +

@@ -5,7 +5,9 @@ import main.java.com.jprr.cadastroPets.repository.FileRepository;
 import main.java.com.jprr.cadastroPets.service.PetService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
@@ -14,6 +16,7 @@ public class App {
             int opt = 0;
             FileRepository fr = new FileRepository();
             PetService ps = new PetService();
+            List<Pet> petList = new ArrayList<>();
 
             do { //TODO: colocar todos os try-catch's dentro do loop
                 fr.readFile(fr.MENU_PATH);
@@ -29,6 +32,11 @@ public class App {
                 switch (opt) {
                     case 1:
                         Pet newPet = ps.createPet(scan);
+                        if (newPet != null) {
+                            petList.add(newPet);
+                        }
+                        fr.createPetFile(petList.getLast());
+                        System.out.println("Pet cadastrado com sucesso.");
                         break;
                     case 2:
                         break;
