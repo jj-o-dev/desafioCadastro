@@ -8,7 +8,10 @@ import main.java.com.jprr.cadastroPets.model.exceptions.PetInfoException;
 import main.java.com.jprr.cadastroPets.repository.FileRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class PetService {
     public Pet createPet(Scanner scan) throws IOException {
@@ -27,6 +30,7 @@ public class PetService {
         String breed;
 
         try {
+            System.out.println();
             // pergunta 1
             fr.fetchLine(fr.FORM_PATH ,1);
             name = scan.nextLine();
@@ -72,5 +76,53 @@ public class PetService {
         }
 
         return new Pet(name, type, sex, address, age, weight, breed);
+    }
+
+    public Set<String> searchPet(Scanner scan, String criteria) {
+        //TODO: acrescentar as regras opcionais, depois de já ter terminado
+        FileRepository fr = new FileRepository();
+        List<Integer> options = new ArrayList<>();
+        List<String> infos = new ArrayList<>();
+
+        try {
+            Validate.criteria(criteria);
+            List<String> crit = List.of(criteria.split(""));
+
+            if (crit.size() > 2) {
+                throw new PetInfoException("Escolha até no máximo 2 critérios");
+            }
+
+            crit.forEach(s -> options.add(Integer.parseInt(s)));
+
+            for (Integer i: options) {
+                switch (i) {
+                    case 1:
+                        System.out.print("Insira o nome ou sobrenome: ");
+                        break;
+                    case 2:
+                        System.out.print("Insira o sexo: ");
+                        break;
+                    case 3:
+                        System.out.print("Insira a idade: ");
+                        break;
+                    case 4:
+                        System.out.print("Insira o peso: ");
+                        break;
+                    case 5:
+                        System.out.print("Insira a raça: ");
+                        break;
+                    case 6:
+                        System.out.print("Insira o endereço [rua, número, cidade]: ");
+                }
+                String info = scan.nextLine();
+                infos.add(info);
+            }
+        }
+        catch (PetInfoException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return fr.searchPetFile(infos);
     }
 }

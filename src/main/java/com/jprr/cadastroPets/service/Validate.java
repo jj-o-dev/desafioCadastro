@@ -115,4 +115,12 @@ public final class Validate {
             throw new PetInfoException("Digite apenas letras sem acento!");
         }
     }
+
+    public static void criteria(String criteria) {
+        criteria = criteria.trim();
+
+        if (!criteria.matches("^[1-6]+$") || criteria.isEmpty()) {
+            throw new PetInfoException("Digite apenas números correspondentes aos critérios");
+        }
+    }
 }

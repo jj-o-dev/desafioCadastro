@@ -5,10 +5,7 @@ import main.java.com.jprr.cadastroPets.repository.FileRepository;
 import main.java.com.jprr.cadastroPets.service.PetService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class App {
     public static void main(String[] args) {
@@ -19,6 +16,7 @@ public class App {
             List<Pet> petList = new ArrayList<>();
 
             do { //TODO: colocar todos os try-catch's dentro do loop
+                System.out.println();
                 fr.readFile(fr.MENU_PATH);
                 System.out.print("Digite o número da operação desejada: ");
                 try {
@@ -34,11 +32,27 @@ public class App {
                         Pet newPet = ps.createPet(scan);
                         if (newPet != null) {
                             petList.add(newPet);
+                            fr.createPetFile(petList.getLast());
+                            System.out.println("Pet cadastrado com sucesso.");
+                        } else {
+                            System.out.println("Erro na criação, tente novamente.");
                         }
-                        fr.createPetFile(petList.getLast());
-                        System.out.println("Pet cadastrado com sucesso.");
+
                         break;
                     case 2:
+                        System.out.println();
+                        fr.readFile(fr.SEARCH_PATH);
+                        String criteria = scan.nextLine();
+                        Set<String> searchResult = ps.searchPet(scan, criteria);
+
+                        if (searchResult != null) {
+                            if (!searchResult.isEmpty()) {
+                                System.out.println("\nRegistro(s) encontrado(s): ");
+                                searchResult.forEach(System.out::println);
+                            } else {
+                                System.out.println("\nNenhum pet encontrado com estas informações.");
+                            }
+                        }
                         break;
                     case 3:
                         break;

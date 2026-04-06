@@ -3,12 +3,15 @@ package main.java.com.jprr.cadastroPets.repository;
 import main.java.com.jprr.cadastroPets.model.entity.Pet;
 import main.java.com.jprr.cadastroPets.model.enums.PetSex;
 import main.java.com.jprr.cadastroPets.model.enums.PetType;
+import main.java.com.jprr.cadastroPets.model.exceptions.PetFileException;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class FileRepository {
 
@@ -16,6 +19,8 @@ public class FileRepository {
             "cadastroPets", "docs", "formulario.txt");
     public final Path MENU_PATH = Path.of("src", "main", "java", "com", "jprr",
             "cadastroPets", "docs", "mainMenu.txt");
+    public final Path SEARCH_PATH = Path.of("src", "main", "java", "com", "jprr",
+            "cadastroPets", "docs", "searchMenu.txt");
     public final Path PET_DIR = Path.of("src", "petsCadastrados");
 
     public void checkFile(Path path) throws IOException {
@@ -51,11 +56,12 @@ public class FileRepository {
             }
             count++;
         }
+
     }
 
     public void createPetFile(Pet pet) throws IOException {
         final String NO_INFO = "NAO INFORMADO";
-        //TODO: criar método para gerar nome do arquivo
+
         BufferedWriter bw = new BufferedWriter(new FileWriter(
                 PET_DIR.toAbsolutePath() + "/" + generateFileName(pet)));
 
@@ -94,7 +100,7 @@ public class FileRepository {
 
         //linha idade
         if (pet.getAge() == 0) {
-            bw.write(NO_INFO);
+            bw.write("5 - " + NO_INFO);
         } else if (pet.getAge() < 1) {
             String months = String.valueOf(pet.getAge()).split("\\.")[1];
             bw.write("5 - " + months + " mes(es)");
@@ -107,9 +113,9 @@ public class FileRepository {
         //linha peso
         if (pet.getWeight() == 0) {
             bw.write("6 - " + NO_INFO);
-
+        } else {
+            bw.write("6 - " + pet.getWeight());
         }
-        bw.write("6 - " + pet.getWeight());
         bw.newLine();
 
         //linha raça
@@ -130,4 +136,58 @@ public class FileRepository {
 
         return (moment.format(format) + "-" + name + ".txt").toUpperCase();
     }
+
+    public Set<String> searchPetFile(List<String> infos) {
+        File dir = new File(String.valueOf(PET_DIR.toAbsolutePath()));
+        File[] files = dir.listFiles();// (dir, name) -> name.endsWith(".txt")   pra filtrar apenas txt
+        Set<String> matches = new LinkedHashSet<>();
+
+        if (files != null) {
+            for (String i: infos) {
+                i = normalizeString(i).toLowerCase();
+                for (File f: files) {
+                    try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            line = normalizeString(line).toLowerCase();
+
+                            if (line.contains(i)) {
+                                matches.add(convertFile(f));
+                            }
+                        }
+                    }
+                    catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+        } else {
+            throw new PetFileException("O diretório está vazia");
+        }
+        return matches;
+    }
+
+    public String convertFile(File file) {
+//        StringBuilder total = new StringBuilder();
+        StringJoiner total = new StringJoiner(" - ");
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+               total.add(line.substring(3));
+            }
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return total.toString();
+    }
+
+    public String normalizeString(String txt) {
+        String normalized = Normalizer.normalize(txt, Normalizer.Form.NFD);// ã -> a
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(normalized).replaceAll("");
+    }
+
+    //TODO: colocar try-with-resources nos métodos, pra garatir que fechem certinho no final
 }

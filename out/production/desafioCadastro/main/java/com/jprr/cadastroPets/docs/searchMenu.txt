@@ -1,0 +1,7 @@
+Escolha até dois critérios de busca:
+1 - Nome ou sobrenome
+2 - Sexo
+3 - Idade
+4 - Peso
+5 - Raça
+6 - Endereço
