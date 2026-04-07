@@ -143,15 +143,15 @@ public class FileRepository {
         Set<String> matches = new LinkedHashSet<>();
 
         if (files != null) {
-            for (String i: infos) {
-                i = normalizeString(i).toLowerCase();
+            for (String info: infos) {
+                info = normalizeString(info).toLowerCase();
                 for (File f: files) {
                     try (BufferedReader br = new BufferedReader(new FileReader(f))) {
                         String line;
                         while ((line = br.readLine()) != null) {
                             line = normalizeString(line).toLowerCase();
 
-                            if (line.contains(i)) {
+                            if (line.contains(info)) {
                                 matches.add(convertFile(f));
                             }
                         }
@@ -159,6 +159,29 @@ public class FileRepository {
                     catch (IOException e) {
                         System.out.println(e.getMessage());
                     }
+                }
+            }
+        } else {
+            throw new PetFileException("O diretório está vazia");
+        }
+        return matches;
+    }
+
+    public Set<String> printAllFiles() {
+        File dir = new File(String.valueOf(PET_DIR.toAbsolutePath()));
+        File[] files = dir.listFiles();// (dir, name) -> name.endsWith(".txt")   pra filtrar apenas txt
+        Set<String> matches = new LinkedHashSet<>();
+
+        if (files != null) {
+            for (File f: files) {
+                try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        matches.add(convertFile(f));
+                    }
+                }
+                catch (IOException e) {
+                    System.out.println(e.getMessage());
                 }
             }
         } else {
@@ -184,6 +207,7 @@ public class FileRepository {
     }
 
     public String normalizeString(String txt) {
+        //todo: passar pro utils/ e organizar melhor depois
         String normalized = Normalizer.normalize(txt, Normalizer.Form.NFD);// ã -> a
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(normalized).replaceAll("");

@@ -14,6 +14,7 @@ public class App {
             FileRepository fr = new FileRepository();
             PetService ps = new PetService();
             List<Pet> petList = new ArrayList<>();
+            List<String> resultList = new ArrayList<>();
 
             do { //TODO: colocar todos os try-catch's dentro do loop
                 System.out.println();
@@ -40,25 +41,39 @@ public class App {
 
                         break;
                     case 2:
+                        //alterar
+                        break;
+                    case 3:
+                        // deletar
+                        break;
+                    case 4:
+                        resultList.clear();
+                        resultList.addAll(fr.printAllFiles());
+
+                        if (!resultList.isEmpty()) {
+                            System.out.println("\nTodos os cadastros: ");
+                            for (int i = 0; i < resultList.size(); i++) {
+                                System.out.println((i + 1) + ". " + resultList.get(i));
+                            }
+                        } else {
+                            System.out.println("\nNenhum cadastro feito ainda.");
+                        }
+                        break;
+                    case 5:
                         System.out.println();
                         fr.readFile(fr.SEARCH_PATH);
                         String criteria = scan.nextLine();
-                        Set<String> searchResult = ps.searchPet(scan, criteria);
+                        resultList.clear();
+                        resultList.addAll(ps.searchPet(scan, criteria));
 
-                        if (searchResult != null) {
-                            if (!searchResult.isEmpty()) {
-                                System.out.println("\nRegistro(s) encontrado(s): ");
-                                searchResult.forEach(System.out::println);
-                            } else {
-                                System.out.println("\nNenhum pet encontrado com estas informações.");
+                        if (!resultList.isEmpty()) {
+                            System.out.println("\nCadastro(s) encontrado(s): ");
+                            for (int i = 0; i < resultList.size(); i++) {
+                                System.out.println((i + 1) + ". " + resultList.get(i));
                             }
+                        } else {
+                            System.out.println("\nNenhum cadastro encontrado com estas informações.");
                         }
-                        break;
-                    case 3:
-                        break;
-                    case 4:
-                        break;
-                    case 5:
                         break;
                     case 6:
                         System.out.println("Finalizando programa...");
