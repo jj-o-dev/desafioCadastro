@@ -15,6 +15,10 @@ public class PetAddress {
         return number;
     }
 
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     public String getCity() {
         return city;
     }

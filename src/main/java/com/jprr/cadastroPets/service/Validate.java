@@ -5,6 +5,8 @@ import main.java.com.jprr.cadastroPets.model.enums.PetType;
 import main.java.com.jprr.cadastroPets.model.enums.PetSex;
 import main.java.com.jprr.cadastroPets.model.exceptions.PetInfoException;
 
+import java.util.Arrays;
+
 public final class Validate {
     public static void name(String name) {
         name = name.trim();
@@ -116,11 +118,27 @@ public final class Validate {
         }
     }
 
-    public static void criteria(String criteria) {
+    public static String criteria(String criteria) {
         criteria = criteria.trim();
 
-        if (!criteria.matches("^[1-6]+$") || criteria.isEmpty()) {
+        if (!criteria.matches("^(?:([1-6])(?!.*\\1))*$") || criteria.isEmpty()) {
             throw new PetInfoException("Digite apenas números correspondentes aos critérios");
         }
+        return padronizeInput(criteria);
+    }
+
+    public static String modify(String modify) {
+        modify = modify.trim();
+
+        if (!modify.matches("^(?:([1-5])(?!.*\\1))*$") || modify.isEmpty()) {
+            throw new PetInfoException("Digite apenas números correspondentes aos critérios");
+        }
+        return padronizeInput(modify);
+    }
+
+    public static String padronizeInput(String input) {
+        char[] caracteres = input.toCharArray();
+        Arrays.sort(caracteres);
+        return new String(caracteres);
     }
 }

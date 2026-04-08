@@ -42,9 +42,39 @@ public class App {
                         break;
                     case 2:
                         //alterar
+                        String fileString;
+                        resultList.clear();
+                        resultList.addAll(fr.printAllFiles());
+
+                        if (!resultList.isEmpty()) {
+                            System.out.println("\nTodos os cadastros: ");
+                            for (int i = 0; i < resultList.size(); i++) {
+                                System.out.println((i + 1) + ". " + resultList.get(i));
+                            }
+                            System.out.print("\nInsira o índice (número da linha) do arquivo que deseja modificar: ");
+                            int index = scan.nextInt() - 1;
+
+                            if (index >= resultList.size() || index < 0) {
+                                System.out.println("Este índice não existe!");
+                                continue;
+                            }
+
+                            fileString = resultList.get(index);
+
+                            System.out.println();
+                            scan.nextLine();
+                            fr.readFile(fr.UPDATE_PATH);
+                            String update = scan.nextLine();
+
+                            ps.updatePet(scan, update, fileString);
+                        } else {
+                            System.out.println("\nNenhum cadastro feito ainda.");
+                        }
+
                         break;
                     case 3:
                         // deletar
+
                         break;
                     case 4:
                         resultList.clear();
@@ -58,6 +88,7 @@ public class App {
                         } else {
                             System.out.println("\nNenhum cadastro feito ainda.");
                         }
+
                         break;
                     case 5:
                         System.out.println();
@@ -74,9 +105,11 @@ public class App {
                         } else {
                             System.out.println("\nNenhum cadastro encontrado com estas informações.");
                         }
+
                         break;
                     case 6:
                         System.out.println("Finalizando programa...");
+
                         break;
                     default:
                         System.out.println("\nNúmero inválido!");
@@ -85,8 +118,11 @@ public class App {
             } while(opt != 6);
 
         }
-        catch (IOException | InputMismatchException e) {
-            System.out.println(e.getMessage());
+        catch (IOException e) {
+            System.out.println("Falha ao acessar arquivos");
+        }
+        catch (InputMismatchException e) {
+            System.out.println("Input inválido, digite apenas valores válidos");
         }
 
     }

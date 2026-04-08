@@ -7,11 +7,9 @@ import main.java.com.jprr.cadastroPets.model.enums.PetSex;
 import main.java.com.jprr.cadastroPets.model.exceptions.PetInfoException;
 import main.java.com.jprr.cadastroPets.repository.FileRepository;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class PetService {
     public Pet createPet(Scanner scan) throws IOException {
@@ -85,8 +83,7 @@ public class PetService {
         List<String> infos = new ArrayList<>();
 
         try {
-            Validate.criteria(criteria);
-            List<String> crit = List.of(criteria.split(""));
+            List<String> crit = List.of(Validate.criteria(criteria).split(""));
 
             if (crit.size() > 2) {
                 throw new PetInfoException("Escolha até no máximo 2 critérios");
@@ -124,5 +121,92 @@ public class PetService {
         }
 
         return fr.searchPetFile(infos);
+    }
+
+    public void updatePet(Scanner scan, String modify, String fileString) {
+        FileRepository fr = new FileRepository();
+        List<Integer> options = new ArrayList<>();
+        Map<Integer, String> info = new LinkedHashMap<>();
+
+        try {
+            List<String> input = List.of(Validate.modify(modify).split(""));
+            input.forEach(s -> options.add(Integer.parseInt(s)));
+
+            for (Integer i: options) {
+                switch (i) {
+                    case 1:
+                        System.out.print("Insira o novo nome: ");
+                        String newName = scan.nextLine();
+                        Validate.name(newName);
+                        if (newName.isBlank()) {
+                            info.put(1, "1 - NAO INFORMADO");
+                        } else {
+                            info.put(1, "1 - " + newName);
+                        }
+
+                        break;
+                    case 2:
+                        System.out.print("Insira o novo endereço ");
+                        System.out.print("Número: ");
+                        String newNum = scan.nextLine();
+                        System.out.print("Cidade: ");
+                        String newCity = scan.nextLine();
+                        System.out.print("Rua: ");
+                        String newStreet = scan.nextLine();
+                        PetAddress newAddress = Validate.address(newNum, newCity, newStreet);
+
+                        if (newAddress.getNumber() == 0) {
+                            info.put(4, "4 - " + newAddress.getStreet() + ", NAO INFORMADO, " + newAddress.getCity());
+                        } else {
+                            info.put(4, "4 - " + newAddress.getStreet() + ", "+ newNum + ", " + newAddress.getCity());
+                        }
+
+                        break;
+                    case 3:
+                        System.out.print("Em anos ou meses? (ano/mes):");
+                        String timeUnit = scan.nextLine();
+                        System.out.print("Insira a nova idade: ");
+                        double newAge = Validate.age(scan.nextLine(), timeUnit);
+                        if (newAge == 0) {
+                            info.put(5, "5 - NAO INFORMADO");
+                        } else if (newAge < 1) {
+                            String months = String.valueOf(newAge).split("\\.")[1];
+                            info.put(5, "5 - " + months + " mes(es)");
+                        } else {
+                            String years = String.valueOf(newAge).split("\\.")[0];
+                            info.put(5, "5 - " + years + " ano(s)");
+                        }
+
+                        break;
+                    case 4:
+                        System.out.print("Insira o novo peso: ");
+                        double newWeight = Validate.weight(scan.nextLine());
+                        if (newWeight == 0) {
+                            info.put(6, "6 - NAO INFORMADO");
+                        } else {
+                            info.put(6,"6 - " + newWeight + "kg");
+                        }
+
+                        break;
+                    case 5:
+                        System.out.print("Insira a nova raça: ");
+                        String newBreed = scan.nextLine();
+                        Validate.breed(newBreed);
+                        if (newBreed.isBlank()) {
+                            info.put(7, "7 - NAO INFORMADO");
+                        } else {
+                            info.put(7, "7 - " + newBreed);
+                        }
+
+                        break;
+                }
+
+            }
+
+            fr.updatePetFile(fileString, info);
+        }
+        catch(PetInfoException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

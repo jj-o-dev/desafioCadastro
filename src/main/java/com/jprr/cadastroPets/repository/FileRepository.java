@@ -6,6 +6,7 @@ import main.java.com.jprr.cadastroPets.model.enums.PetType;
 import main.java.com.jprr.cadastroPets.model.exceptions.PetFileException;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
@@ -21,6 +22,8 @@ public class FileRepository {
             "cadastroPets", "docs", "mainMenu.txt");
     public final Path SEARCH_PATH = Path.of("src", "main", "java", "com", "jprr",
             "cadastroPets", "docs", "searchMenu.txt");
+    public final Path UPDATE_PATH = Path.of("src", "main", "java", "com", "jprr",
+            "cadastroPets", "docs", "updateMenu.txt");
     public final Path PET_DIR = Path.of("src", "petsCadastrados");
 
     public void checkFile(Path path) throws IOException {
@@ -114,7 +117,7 @@ public class FileRepository {
         if (pet.getWeight() == 0) {
             bw.write("6 - " + NO_INFO);
         } else {
-            bw.write("6 - " + pet.getWeight());
+            bw.write("6 - " + pet.getWeight() + "kg");
         }
         bw.newLine();
 
@@ -139,7 +142,7 @@ public class FileRepository {
 
     public Set<String> searchPetFile(List<String> infos) {
         File dir = new File(String.valueOf(PET_DIR.toAbsolutePath()));
-        File[] files = dir.listFiles();// (dir, name) -> name.endsWith(".txt")   pra filtrar apenas txt
+        File[] files = dir.listFiles();// (dir, name) -> name.endsWith(".txt")  //pra filtrar apenas txt
         Set<String> matches = new LinkedHashSet<>();
 
         if (files != null) {
@@ -208,9 +211,37 @@ public class FileRepository {
 
     public String normalizeString(String txt) {
         //todo: passar pro utils/ e organizar melhor depois
-        String normalized = Normalizer.normalize(txt, Normalizer.Form.NFD);// ã -> a
+        String normalized = Normalizer.normalize(txt, Normalizer.Form.NFD);// ã -> a + ~
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(normalized).replaceAll("");
+    }
+
+    public void updatePetFile(String fileString, Map<Integer, String> info) {
+        File dir = new File(String.valueOf(PET_DIR.toAbsolutePath()));
+        File[] files = dir.listFiles();
+
+        if (files != null) {
+            for (File file: files) {
+                if (fileString.equalsIgnoreCase(convertFile(file))) {
+
+                    try {
+                        List<String> lines = Files.readAllLines(file.toPath());
+
+                        for (Integer key: info.keySet()) {
+                            lines.set(key - 1, info.get(key));
+                        }
+
+                        String newContent = String.join(System.lineSeparator(), lines);
+                        Files.writeString(file.toPath(), newContent);
+                        System.out.println("\nRegistro atualizado.");
+                    }
+                    catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+        }
+
     }
 
     //TODO: colocar try-with-resources nos métodos, pra garatir que fechem certinho no final
