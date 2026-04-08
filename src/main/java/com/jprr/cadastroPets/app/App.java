@@ -41,7 +41,6 @@ public class App {
 
                         break;
                     case 2:
-                        //alterar
                         String fileString;
                         resultList.clear();
                         resultList.addAll(fr.printAllFiles());
@@ -73,7 +72,30 @@ public class App {
 
                         break;
                     case 3:
-                        // deletar
+                        resultList.clear();
+                        resultList.addAll(fr.printAllFiles());
+
+                        if (!resultList.isEmpty()) {
+                            System.out.println("\nTodos os cadastros: ");
+                            for (int i = 0; i < resultList.size(); i++) {
+                                System.out.println((i + 1) + ". " + resultList.get(i));
+                            }
+
+                            System.out.print("\nInsira o índice (número da linha) do arquivo que deseja deletar: ");
+                            int index = scan.nextInt() - 1;
+
+                            if (index >= resultList.size() || index < 0) {
+                                System.out.println("Este índice não existe!");
+                                continue;
+                            }
+
+                            scan.nextLine();
+                            String fileToDelete = resultList.get(index);
+                            ps.deletePet(scan, fileToDelete);
+
+                        } else {
+                            System.out.println("\nNenhum cadastro feito ainda.");
+                        }
 
                         break;
                     case 4:

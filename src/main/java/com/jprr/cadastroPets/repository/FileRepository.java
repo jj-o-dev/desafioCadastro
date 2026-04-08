@@ -244,5 +244,19 @@ public class FileRepository {
 
     }
 
+    public boolean deleteFile(String fileToDelete) {
+        File dir = new File(String.valueOf(PET_DIR.toAbsolutePath()));
+        File[] files = dir.listFiles();
+
+        if (files != null) {
+            for (File file: files) {
+                if (fileToDelete.equalsIgnoreCase(convertFile(file))) {
+                    return file.delete();
+                }
+            }
+        }
+        return false;
+    }
+
     //TODO: colocar try-with-resources nos métodos, pra garatir que fechem certinho no final
 }

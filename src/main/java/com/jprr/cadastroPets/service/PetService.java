@@ -7,14 +7,13 @@ import main.java.com.jprr.cadastroPets.model.enums.PetSex;
 import main.java.com.jprr.cadastroPets.model.exceptions.PetInfoException;
 import main.java.com.jprr.cadastroPets.repository.FileRepository;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 public class PetService {
-    public Pet createPet(Scanner scan) throws IOException {
-        FileRepository fr = new FileRepository();
+    FileRepository fr = new FileRepository();
 
+    public Pet createPet(Scanner scan) throws IOException {
         String name;
         PetType type;
         PetSex sex;
@@ -78,7 +77,6 @@ public class PetService {
 
     public Set<String> searchPet(Scanner scan, String criteria) {
         //TODO: acrescentar as regras opcionais, depois de já ter terminado
-        FileRepository fr = new FileRepository();
         List<Integer> options = new ArrayList<>();
         List<String> infos = new ArrayList<>();
 
@@ -124,7 +122,6 @@ public class PetService {
     }
 
     public void updatePet(Scanner scan, String modify, String fileString) {
-        FileRepository fr = new FileRepository();
         List<Integer> options = new ArrayList<>();
         Map<Integer, String> info = new LinkedHashMap<>();
 
@@ -207,6 +204,21 @@ public class PetService {
         }
         catch(PetInfoException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void deletePet(Scanner scan, String fileToDelete) {
+        System.out.println("Tem certeza que deseja deletar? [SIM/NAO]");
+        String deletionConfirm = scan.nextLine();
+
+        if (deletionConfirm.equalsIgnoreCase("SIM")) {
+            if (fr.deleteFile(fileToDelete)) {
+                System.out.println("\nArquivo deletado com sucesso.");
+            } else {
+                System.out.println("Erro ao deletar!");
+            }
+        } else {
+            System.out.println("Deleção cancelada.");
         }
     }
 }
