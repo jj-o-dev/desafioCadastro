@@ -26,18 +26,6 @@ public class FileRepository {
             "cadastroPets", "docs", "updateMenu.txt");
     public final Path PET_DIR = Path.of("src", "petsCadastrados");
 
-    public void checkFile(Path path) throws IOException {
-        File file = new File(String.valueOf(path.toAbsolutePath()));
-        if (!file.exists()) {
-            //TODO: terminar depois
-            createFile(String.valueOf(path.toAbsolutePath()));
-        }
-    }
-
-    public void createFile(String path) {
-        //TODO: terminar depois
-    }
-
     public void readFile(Path path) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(String.valueOf(path.toAbsolutePath())));
         String line = br.readLine();
@@ -48,87 +36,94 @@ public class FileRepository {
         }
     }
 
-    public void fetchLine(Path path, int lineNum) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(String.valueOf(path.toAbsolutePath())));
-        String line;
-        int count = 1;
+    public void fetchLine(Path path, int lineNum) {
+        try (BufferedReader br = new BufferedReader(new FileReader(String.valueOf(path.toAbsolutePath())))) {
+            String line;
+            int count = 1;
 
-        while ((line = br.readLine()) != null) {
-            if (count == lineNum) {
-                System.out.println(line);
+            while ((line = br.readLine()) != null) {
+                if (count == lineNum) {
+                    System.out.println(line);
+                }
+                count++;
             }
-            count++;
         }
-
+        catch (IOException e) {
+            System.out.println("Erro ao acessar arquivo");
+        }
     }
 
-    public void createPetFile(Pet pet) throws IOException {
+    public void createPetFile(Pet pet) {
         final String NO_INFO = "NAO INFORMADO";
 
-        BufferedWriter bw = new BufferedWriter(new FileWriter(
-                PET_DIR.toAbsolutePath() + "/" + generateFileName(pet)));
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(
+                PET_DIR.toAbsolutePath() + "/" + generateFileName(pet)))) {
 
-        //linha nome
-        if (pet.getName().isBlank()) {
-            bw.write("1 - " + NO_INFO);
-        } else {
-            bw.write("1 - " + pet.getName());
+            //linha nome
+            if (pet.getName().isBlank()) {
+                bw.write("1 - " + NO_INFO);
+            } else {
+                bw.write("1 - " + pet.getName());
+            }
+            bw.newLine();
+
+            //linha tipo
+            if (pet.getType().equals(PetType.DOG)) {
+                bw.write("2 - " + "Cachorro");
+            } else {
+                bw.write("2 - " + "Gato");
+            }
+            bw.newLine();
+
+            //linha sexo
+            if (pet.getPetSex().equals(PetSex.FEMALE)) {
+                bw.write("3 - " + "Femea");
+            } else {
+                bw.write("3 - " + "Macho");
+            }
+            bw.newLine();
+
+            //linha endereço
+            if (pet.getPetAddress().getNumber() == 0) {
+                bw.write("4 - " + pet.getPetAddress().getStreet()+", "+NO_INFO+", "+pet.getPetAddress().getCity());
+            } else {
+                bw.write("4 - " + pet.getPetAddress().getStreet()+", "+
+                        pet.getPetAddress().getNumber() +", "+pet.getPetAddress().getCity());
+            }
+            bw.newLine();
+
+            //linha idade
+            if (pet.getAge() == 0) {
+                bw.write("5 - " + NO_INFO);
+            } else if (pet.getAge() < 1) {
+                String months = String.valueOf(pet.getAge()).split("\\.")[1];
+                bw.write("5 - " + months + " mes(es)");
+            } else {
+                String years = String.valueOf(pet.getAge()).split("\\.")[0];
+                bw.write("5 - " + years + " ano(s)");
+            }
+            bw.newLine();
+
+            //linha peso
+            if (pet.getWeight() == 0) {
+                bw.write("6 - " + NO_INFO);
+            } else {
+                bw.write("6 - " + pet.getWeight() + "kg");
+            }
+            bw.newLine();
+
+            //linha raça
+            if (pet.getBreed().isBlank()) {
+                bw.write("7 - " + NO_INFO);
+            } else {
+                bw.write("7 - " + pet.getBreed());
+            }
+
+            bw.flush();
         }
-        bw.newLine();
-
-        //linha tipo
-        if (pet.getType().equals(PetType.DOG)) {
-            bw.write("2 - " + "Cachorro");
-        } else {
-            bw.write("2 - " + "Gato");
+        catch (IOException e) {
+            System.out.println("Erro na criação do arquivo");
         }
-        bw.newLine();
-
-        //linha sexo
-        if (pet.getPetSex().equals(PetSex.FEMALE)) {
-            bw.write("3 - " + "Femea");
-        } else {
-            bw.write("3 - " + "Macho");
-        }
-        bw.newLine();
-
-        //linha endereço
-        if (pet.getPetAddress().getNumber() == 0) {
-            bw.write("4 - " + pet.getPetAddress().getStreet()+", "+NO_INFO+", "+pet.getPetAddress().getCity());
-        } else {
-            bw.write("4 - " + pet.getPetAddress().getStreet()+", "+
-                    pet.getPetAddress().getNumber() +", "+pet.getPetAddress().getCity());
-        }
-        bw.newLine();
-
-        //linha idade
-        if (pet.getAge() == 0) {
-            bw.write("5 - " + NO_INFO);
-        } else if (pet.getAge() < 1) {
-            String months = String.valueOf(pet.getAge()).split("\\.")[1];
-            bw.write("5 - " + months + " mes(es)");
-        } else {
-            String years = String.valueOf(pet.getAge()).split("\\.")[0];
-            bw.write("5 - " + years + " ano(s)");
-        }
-        bw.newLine();
-
-        //linha peso
-        if (pet.getWeight() == 0) {
-            bw.write("6 - " + NO_INFO);
-        } else {
-            bw.write("6 - " + pet.getWeight() + "kg");
-        }
-        bw.newLine();
-
-        //linha raça
-        if (pet.getBreed().isBlank()) {
-            bw.write("7 - " + NO_INFO);
-        } else {
-            bw.write("7 - " + pet.getBreed());
-        }
-
-        bw.flush();
     }
 
     public String generateFileName(Pet pet) {
@@ -142,30 +137,46 @@ public class FileRepository {
 
     public Set<String> searchPetFile(List<String> infos) {
         File dir = new File(String.valueOf(PET_DIR.toAbsolutePath()));
-        File[] files = dir.listFiles();// (dir, name) -> name.endsWith(".txt")  //pra filtrar apenas txt
+        File[] files = dir.listFiles();
         Set<String> matches = new LinkedHashSet<>();
+        Set<File> tempSet = new LinkedHashSet<>();
 
         if (files != null) {
-            for (String info: infos) {
-                info = normalizeString(info).toLowerCase();
-                for (File f: files) {
-                    try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            line = normalizeString(line).toLowerCase();
+            Set<File> filesSet = new LinkedHashSet<>(Arrays.asList(files));
 
-                            if (line.contains(info)) {
-                                matches.add(convertFile(f));
+            if (!filesSet.isEmpty()) {
+                for (int i = 0; i < infos.size(); i++) {
+                    String info = normalizeString(infos.get(i)).toLowerCase();
+
+                    for (File file: filesSet) {
+                        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                            String line;
+                            while ((line = br.readLine()) != null) {
+                                line = normalizeString(line).toLowerCase();
+
+                                if (line.contains(info)) {
+                                    tempSet.add(file);
+                                }
                             }
                         }
+                        catch (IOException e) {
+                            System.out.println(e.getMessage());
+                        }
                     }
-                    catch (IOException e) {
-                        System.out.println(e.getMessage());
+
+                    filesSet.retainAll(tempSet);
+                    if (infos.size() > 1 && i == 0) {
+                        tempSet.clear();
                     }
                 }
+
+                for (File file: tempSet) {
+                    matches.add(convertFile(file));
+                }
+
+            } else {
+                throw new PetFileException("O diretório está vazia");
             }
-        } else {
-            throw new PetFileException("O diretório está vazia");
         }
         return matches;
     }
@@ -177,15 +188,7 @@ public class FileRepository {
 
         if (files != null) {
             for (File f: files) {
-                try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        matches.add(convertFile(f));
-                    }
-                }
-                catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
+                matches.add(convertFile(f));
             }
         } else {
             throw new PetFileException("O diretório está vazia");
@@ -258,5 +261,4 @@ public class FileRepository {
         return false;
     }
 
-    //TODO: colocar try-with-resources nos métodos, pra garatir que fechem certinho no final
 }

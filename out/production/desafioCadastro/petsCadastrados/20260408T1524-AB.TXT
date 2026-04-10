@@ -1,7 +1,0 @@
-1 - a b
-2 - Gato
-3 - Macho
-4 - y, NAO INFORMADO, x
-5 - 1 ano(s)
-6 - 10.0kg
-7 - xyz

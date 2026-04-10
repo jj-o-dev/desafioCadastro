@@ -9,27 +9,34 @@ import java.util.*;
 
 public class App {
     public static void main(String[] args) {
-        try (Scanner scan = new Scanner(System.in)){
-            int opt = 0;
-            FileRepository fr = new FileRepository();
-            PetService ps = new PetService();
-            List<Pet> petList = new ArrayList<>();
-            List<String> resultList = new ArrayList<>();
+        Scanner scan = new Scanner(System.in);
+        int opt = 0;
+        FileRepository fr = new FileRepository();
+        PetService ps = new PetService();
+        List<Pet> petList = new ArrayList<>();
+        List<String> resultList = new ArrayList<>();
+        String fileError = "Erro ao acessar arquivo";
+        String badInputError = "Input inválido, digite apenas números inteiros";
 
-            do { //TODO: colocar todos os try-catch's dentro do loop
-                System.out.println();
+        do {
+            System.out.println();
+            try {
                 fr.readFile(fr.MENU_PATH);
                 System.out.print("Digite o número da operação desejada: ");
-                try {
-                    opt = 0;
-                    opt = scan.nextInt();
-                } catch (InputMismatchException e) {
-                    System.out.println("Erro: digite apenas números válidos!");
-                }
+                opt = 0;
+                opt = scan.nextInt();
+            }
+            catch (InputMismatchException e) {
+                System.out.println("Erro: digite apenas números válidos!");
+            }
+            catch (IOException e) {
+                System.out.println(fileError);
+            }
 
-                scan.nextLine();
-                switch (opt) {
-                    case 1:
+            scan.nextLine();
+            switch (opt) {
+                case 1:
+                    try {
                         Pet newPet = ps.createPet(scan);
                         if (newPet != null) {
                             petList.add(newPet);
@@ -38,52 +45,69 @@ public class App {
                         } else {
                             System.out.println("Erro na criação, tente novamente.");
                         }
+                    }
+                    catch (InputMismatchException e) {
+                        System.out.println("Erro: digite apenas números válidos!");
+                    }
+                    catch (IOException e) {
+                        System.out.println(fileError);
+                    }
 
-                        break;
-                    case 2:
-                        String fileString;
-                        resultList.clear();
-                        resultList.addAll(fr.printAllFiles());
+                    break;
+                case 2:
+                    String fileString;
+                    resultList.clear();
+                    resultList.addAll(fr.printAllFiles());
 
-                        if (!resultList.isEmpty()) {
-                            System.out.println("\nTodos os cadastros: ");
-                            for (int i = 0; i < resultList.size(); i++) {
-                                System.out.println((i + 1) + ". " + resultList.get(i));
-                            }
-                            System.out.print("\nInsira o índice (número da linha) do arquivo que deseja modificar: ");
+                    if (!resultList.isEmpty()) {
+                        System.out.println("\nTodos os cadastros: ");
+                        for (int i = 0; i < resultList.size(); i++) {
+                            System.out.println((i + 1) + ". " + resultList.get(i));
+                        }
+                        System.out.print("\nInsira o índice (número da linha) do arquivo que deseja modificar: ");
+
+                        try {
                             int index = scan.nextInt() - 1;
-
                             if (index >= resultList.size() || index < 0) {
                                 System.out.println("Este índice não existe!");
                                 continue;
                             }
 
                             fileString = resultList.get(index);
-
-                            System.out.println();
-                            scan.nextLine();
-                            fr.readFile(fr.UPDATE_PATH);
-                            String update = scan.nextLine();
-
-                            ps.updatePet(scan, update, fileString);
-                        } else {
-                            System.out.println("\nNenhum cadastro feito ainda.");
+                        } catch (InputMismatchException e) {
+                            System.out.println(badInputError);
+                            continue;
                         }
 
-                        break;
-                    case 3:
-                        resultList.clear();
-                        resultList.addAll(fr.printAllFiles());
+                        System.out.println();
+                        scan.nextLine();
+                        try {
+                            fr.readFile(fr.UPDATE_PATH);
+                        } catch (IOException e) {
+                            System.out.println(fileError);
+                            continue;
+                        }
 
-                        if (!resultList.isEmpty()) {
-                            System.out.println("\nTodos os cadastros: ");
-                            for (int i = 0; i < resultList.size(); i++) {
-                                System.out.println((i + 1) + ". " + resultList.get(i));
-                            }
+                        String update = scan.nextLine();
+                        ps.updatePet(scan, update, fileString);
+                    } else {
+                        System.out.println("\nNenhum cadastro feito ainda.");
+                    }
 
-                            System.out.print("\nInsira o índice (número da linha) do arquivo que deseja deletar: ");
+                    break;
+                case 3:
+                    resultList.clear();
+                    resultList.addAll(fr.printAllFiles());
+
+                    if (!resultList.isEmpty()) {
+                        System.out.println("\nTodos os cadastros: ");
+                        for (int i = 0; i < resultList.size(); i++) {
+                            System.out.println((i + 1) + ". " + resultList.get(i));
+                        }
+
+                        System.out.print("\nInsira o índice (número da linha) do arquivo que deseja deletar: ");
+                        try {
                             int index = scan.nextInt() - 1;
-
                             if (index >= resultList.size() || index < 0) {
                                 System.out.println("Este índice não existe!");
                                 continue;
@@ -92,32 +116,41 @@ public class App {
                             scan.nextLine();
                             String fileToDelete = resultList.get(index);
                             ps.deletePet(scan, fileToDelete);
-
-                        } else {
-                            System.out.println("\nNenhum cadastro feito ainda.");
+                        } catch (InputMismatchException e) {
+                            System.out.println(badInputError);
                         }
+                    } else {
+                        System.out.println("\nNenhum cadastro feito ainda.");
+                    }
 
-                        break;
-                    case 4:
-                        resultList.clear();
-                        resultList.addAll(fr.printAllFiles());
+                    break;
+                case 4:
+                    resultList.clear();
+                    resultList.addAll(fr.printAllFiles());
 
-                        if (!resultList.isEmpty()) {
-                            System.out.println("\nTodos os cadastros: ");
-                            for (int i = 0; i < resultList.size(); i++) {
-                                System.out.println((i + 1) + ". " + resultList.get(i));
-                            }
-                        } else {
-                            System.out.println("\nNenhum cadastro feito ainda.");
+                    if (!resultList.isEmpty()) {
+                        System.out.println("\nTodos os cadastros: ");
+                        for (int i = 0; i < resultList.size(); i++) {
+                            System.out.println((i + 1) + ". " + resultList.get(i));
                         }
+                    } else {
+                        System.out.println("\nNenhum cadastro feito ainda.");
+                    }
 
-                        break;
-                    case 5:
-                        System.out.println();
+                    break;
+                case 5:
+                    System.out.println();
+                    try {
                         fr.readFile(fr.SEARCH_PATH);
-                        String criteria = scan.nextLine();
-                        resultList.clear();
-                        resultList.addAll(ps.searchPet(scan, criteria));
+                    } catch (IOException e) {
+                        System.out.println(fileError);
+                    }
+
+                    String criteria = scan.nextLine();
+                    resultList.clear();
+                    Set<String> set = ps.searchPet(scan, criteria);
+                    if (set != null) {
+                        resultList.addAll(set);
 
                         if (!resultList.isEmpty()) {
                             System.out.println("\nCadastro(s) encontrado(s): ");
@@ -127,25 +160,16 @@ public class App {
                         } else {
                             System.out.println("\nNenhum cadastro encontrado com estas informações.");
                         }
+                    }
 
-                        break;
-                    case 6:
-                        System.out.println("Finalizando programa...");
-
-                        break;
-                    default:
-                        System.out.println("\nNúmero inválido!");
-                }
-
-            } while(opt != 6);
-
-        }
-        catch (IOException e) {
-            System.out.println("Falha ao acessar arquivos");
-        }
-        catch (InputMismatchException e) {
-            System.out.println("Input inválido, digite apenas valores válidos");
-        }
-
+                    break;
+                case 6:
+                    System.out.println("Finalizando programa...");
+                    break;
+                default:
+                    System.out.println("\nNúmero de operação inválido!");
+            }
+        } while(opt != 6);
+        scan.close();
     }
 }
